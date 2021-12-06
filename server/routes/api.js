@@ -4,7 +4,8 @@ const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const {body, validationResult } = require("express-validator");
 const User = require("../models/User");
-const Todo = require("../models/Post");
+const Post = require("../models/Post");
+const Comment = require("../models/Comment");
 const jwt = require("jsonwebtoken");
 const validateToken = require("../auth/validateToken");
 
@@ -56,9 +57,9 @@ router.get("/user/login", (req, res, next) => {
 });
 
 router.post("/user/login",
-	    body("email").isEmail().normalizeEmail().escape(),
-	    body("password"),
-	    (req, res, next) => {
+	body("email").isEmail().normalizeEmail().escape(),
+	body("password"),
+	(req, res, next) => {
 		User.findOne({email: req.body.email}, (err, user) => {
 		    if (err) throw err;
 		    if (!user) {
@@ -86,14 +87,49 @@ router.post("/user/login",
 			});
 		    }
 		});
-	    });
+	});
+	
+// Posts
+// Get all posts
+router.get("/post", (req, res, next) => {
+	Post.find({}, (err, post) => {
+		if (err) throw err;
+		if (!post) {
+			return res.status(404).json({message: "Posts not found"});
+		} else {
+			return res.json({post});
+		}
+	})
+	// return all posts
+})
 
-// Private
-router.get("/private", validateToken, (req, res, next) => {
-    return res.json({email: req.user.email});
-});
+// Post new post
+router.post("/post", validateToken, (req, res, next) => {
+	// return post id, success
+})
 
+// Edit existing post
+router.post("/post/:id", validateToken, (req, res, next) => {
+	// return post id, success
+})
 
+// Comments
+// Get comment by id
+router.get("/comment/:id", (req, res, next) => {
+	// return comment
+})
+
+// Post new comment
+router.post("/comment", validateToken, (req, res, next) => {
+	// return comment id
+})
+
+// Edit existing comment
+router.post("/comment/:id", validateToken, (req, res, next) => {
+	// return comment id, success
+})
+
+// Old endpoints, just for example!
 // Todos
 router.post("/todos", validateToken, (req, res, next) => {
     User.findOne({email: req.user.email}, (err, user) => {
