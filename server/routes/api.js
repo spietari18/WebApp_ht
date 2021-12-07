@@ -41,9 +41,9 @@ router.post("/user/register",
 				User.create({
 				    email: req.body.email,
 				    password: hash
-				}, (err, ok) => {
+				}, (err, user) => {
 				    if (err) throw err;
-				    return res.redirect("/api/user/login");
+				    return res.status(200).json({email: user.email});
 				});
 			    });
 			});
@@ -81,7 +81,7 @@ router.post("/user/login",
 					 // Return token on success
 					 (err, token) => {
 					     if (err) throw err;
-					     return res.json({success: true, token});
+					     return res.status(200).json({success: true, token});
 					 });
 			    } else {
 				return res.status(403).json({message: "Login failed :("});

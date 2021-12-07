@@ -6,8 +6,8 @@ const Schema = mongoose.Schema;
 let commentSchema = new Schema({
     user: mongoose.ObjectId,        // Comments author
     comment: String,                // Comment text
-    timestamp: String,              // Comments original timestamp
-    lastedit: String                // Last edited timestamp
+    timestamp: Date,                // Comments original timestamp
+    lastedit: Date                  // Last edited timestamp
 });
 
 module.exports = mongoose.model("comments", commentSchema);
