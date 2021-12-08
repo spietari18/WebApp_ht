@@ -66,10 +66,10 @@ response: 200 OK, {comment}
 
 #### Author
 ##### Get author information (not password hash)
-auth: none
-path: /api/author
-type: GET
-response: 200 OK, {user}
+auth: none  
+path: /api/author  
+type: GET  
+response: 200 OK, {user}  
 
 ## Client
 
