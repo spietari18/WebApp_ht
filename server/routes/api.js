@@ -195,6 +195,18 @@ router.post("/comment/:id", validateToken, (req, res, next) => {
 	})
 })
 
+// Userdata (author)
+// Get author's email
+router.get("/author/:id", (req, res, next) => {
+	User.findOne({_id: req.params.id}, (err, user) => {
+		if (err) throw err;
+		if (user) {
+			delete user.password;
+			return res.status(200).json(user)
+		}
+	})
+})
+
 // Old endpoints, just for example!
 // Todos
 router.post("/todos", validateToken, (req, res, next) => {
