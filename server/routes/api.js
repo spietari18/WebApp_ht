@@ -99,6 +99,7 @@ router.get("/post", (req, res, next) => {
 		if (!post) {
 			return res.status(404).json({message: "Posts not found"});
 		} else {
+			//TODO replace author id by author object
 			return res.json({post});
 		}
 	})
@@ -153,6 +154,7 @@ router.get("/comment/:id", (req, res, next) => {
 			return next(err);
 		}
 		if (comment) {
+			//TODO replace author id by author object!
 			return res.json({comment});
 		} else {
 			return res.status(404).send(`Post id ${req.params.id} not found`);

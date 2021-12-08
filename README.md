@@ -18,7 +18,7 @@ auth: NO
 path: /api/user/register  
 type: POST  
 parameters: email, password  
-response: 200 OK, {success: true, token: <token>}  
+response: 200 OK, {success: true, token: < token >}  
 
 #### Posts
 ##### Get all posts:
