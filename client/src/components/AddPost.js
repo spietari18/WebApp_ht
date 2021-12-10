@@ -1,7 +1,6 @@
 import {useState} from 'react';
-import {Redirect} from 'react-router-dom';
 
-function AddPost({posts, setPosts}) {
+function AddPost({posts, setPosts, jwt, user}) {
     const [postData, setPostData] = useState({});
 
     const submit = (e) => {
@@ -10,7 +9,8 @@ function AddPost({posts, setPosts}) {
         fetch("/api/post", {
             method: "POST",
             headers: {
-                "Content-type": "application/json"
+                "Content-type": "application/json",
+                "authorization": "bearer " + jwt
             },
             body: JSON.stringify(postData),
             mode: "cors"
@@ -18,13 +18,13 @@ function AddPost({posts, setPosts}) {
         .then(response => response.json())
         .then(data => {
             if (data.post) {
-                setComments([...posts, data.post])
+                setPosts([...posts, data.post])
             }
         })
     }
 
     const handleChange = (e) => {
-        setCommentData({...postData, [e.target.name]: e.target.value})
+        setPostData({...postData, [e.target.name]: e.target.value})
     }
 
     return (

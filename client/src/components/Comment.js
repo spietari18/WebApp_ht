@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-function Comment(comment) {
+function Comment({comment}) {
     const [author, setAuthor] = useState({});
 
     useEffect(() => {

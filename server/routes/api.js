@@ -8,6 +8,7 @@ const Post = require("../models/Post");
 const Comment = require("../models/Comment");
 const jwt = require("jsonwebtoken");
 const validateToken = require("../auth/validateToken");
+const { $where } = require('../models/User');
 
 // Register
 router.post("/user/register",
@@ -26,12 +27,12 @@ router.post("/user/register",
 		    return res.status(400).json({errors: errors.array()});
 		}
 		// Check if email already in use
-		User.findOne({email: req.body.email}, (err, user) => {
+		User.findOne({email: req.body.email}, (err, users) => {
 		    if (err) {
 			console.log(err);
 			throw err;
 		    }
-		    if (user) {
+		    if (users) {
 			return res.status(403).json({email: "Email already in use."});
 		    } else {
 			// Generate password hash and store new user
@@ -41,9 +42,9 @@ router.post("/user/register",
 				User.create({
 				    email: req.body.email,
 				    password: hash
-				}, (err, user) => {
+				}, (err, users) => {
 				    if (err) throw err;
-				    return res.status(200).json({email: user.email});
+				    return res.status(200).json({email: users.email});
 				});
 			    });
 			});
@@ -58,19 +59,19 @@ router.post("/user/login",
 	body("password"),
 	(req, res, next) => {
 		// Find user by email
-		User.findOne({email: req.body.email}, (err, user) => {
+		User.findOne({email: req.body.email}, (err, users) => {
 		    if (err) throw err;
-		    if (!user) {
+		    if (!users) {
 			return res.status(403).json({message: "Login failed :("});
 		    } else {
 			// User found, compare password hashes
-			bcrypt.compare(req.body.password, user.password, (err, isMatch) => {
+			bcrypt.compare(req.body.password, users.password, (err, isMatch) => {
 			    if (err) throw err;
 			    if (isMatch) {
 				// Create jsonwebtoken by using users id and email
 				const jwtPayload = {
-				    id: user._id,
-				    email: user.email
+				    id: users._id,
+				    email: users.email
 				}
 				// Sign token with secret, set expiration
 				jwt.sign(jwtPayload,
@@ -99,16 +100,27 @@ router.get("/post", (req, res, next) => {
 		if (!post) {
 			return res.status(404).json({message: "Posts not found"});
 		} else {
-			//TODO replace author id by author object
-			return res.json({post});
+			return res.status(200).json({post});
 		}
 	})
 })
 
+// Get one post
+router.get("/post/:id", (req, res, next) => {
+	Post.findOne({_id: req.params.id}, (err, post) => {
+		if (err) throw err;
+		if (!post) {
+			return res.status(404).json({message: "Post not found"});
+		} else {
+			return res.status(200).json({post});
+		}
+	})
+});
+
 // Post a new post
 router.post("/post", validateToken, (req, res, next) => {
 	Post.create({
-		user: req.body.user,
+		user: req.user.id,
 		post: req.body.post,
 		timestamp: Date.now()
 	}, (err, post) => {
@@ -163,18 +175,19 @@ router.get("/comment/:id", (req, res, next) => {
 })
 
 // Post new comment
-router.post("/comment", validateToken, (req, res, next) => {
+router.post("/comment/:id", validateToken, (req, res, next) => {
 	Comment.create({
-		user: req.body.user,
+		user: req.user.id,
 		comment: req.body.comment,
 		timestamp: Date.now()
 	}, (err, comment) => {
-		Post.findOne({_id: req.body.post_id}, (err, post) => {
+		Post.findOne({_id: req.params.id}, (err, post) => {
 			if (err) throw err;
 			if (post) {
+				console.log("New comment");
 				let comments = post.comments;
-				comments.push(comment._id)
-				Post.update({id: req.body.post_id}, {comments: comments},(err, post) => {
+				comments.push(comment._id);
+				Post.updateOne({id: req.params.id}, {comments: comments},(err, post) => {
 					if (err) throw err;
 					if (post) {
 						return res.status(200).json(comment);
@@ -198,11 +211,18 @@ router.post("/comment/:id", validateToken, (req, res, next) => {
 // Userdata (author)
 // Get author's email
 router.get("/author/:id", (req, res, next) => {
-	User.findOne({_id: req.params.id}, (err, user) => {
-		if (err) throw err;
-		if (user) {
-			delete user.password;
-			return res.status(200).json(user)
+	User.findOne({_id: req.params.id}, (err, users) => {
+		if (err) {
+			if (err.name === "CastError") {
+				return res.status(404).send(`Post id ${req.params.id} not found`);
+			} else {
+				throw err;
+			}
+		}
+		if (users) {
+			delete users.password;
+			console.log(users)
+			return res.status(200).json(users)
 		}
 	})
 })

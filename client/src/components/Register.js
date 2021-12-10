@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 function Register() {
     const [userData, setUserData] = useState({});
@@ -17,8 +17,8 @@ function Register() {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.email === userData.email) {
-                return <Redirect to='/login' />
+            if (data.email) {
+                return <Navigate to="/login" />
             }
         })
     }
@@ -31,8 +31,8 @@ function Register() {
         <div>
             <h2>Register</h2>
             <form onSubmit={submit} onChange={handleChange}>
-                <input type="text" name="email" />
-                <input type="password" name="password" />
+                <input type="text" name="email" placeholder="email" />
+                <input type="password" name="password" placeholder="password" />
                 <input type="submit" />
             </form>
         </div>
