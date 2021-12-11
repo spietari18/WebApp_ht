@@ -32,7 +32,7 @@ function AddPost({posts, setPosts, jwt, user}) {
             <h4>New Post</h4>
             <form onSubmit={submit} onChange={handleChange}>
                 <input type="text-area" name="post" />
-                <input type="submit" />
+                <input type="submit" className="btn" />
             </form>
         </div>
     )

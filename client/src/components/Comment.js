@@ -4,7 +4,7 @@ function Comment({comment}) {
     const [author, setAuthor] = useState({});
 
     useEffect(() => {
-        fetch("/api/user/" + comment.author)
+        fetch("/api/author/" + comment.user)
         .then(response => response.json())
         .then(json => setAuthor(json))
     }, [comment.author])

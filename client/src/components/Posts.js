@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
+import Post from "./Post";
 import AddPost from "./AddPost";
 
 function Posts({user, jwt}) {
     const [posts, setPosts] = useState([]);
-    const [authors, setAuthors] = useState([]);
 
     useEffect(() => {
         fetch("/api/post", {
@@ -20,25 +20,13 @@ function Posts({user, jwt}) {
         })
     }, []);
 
-    useEffect(() => {
-        let tempAuthorList = [];
-        posts.forEach(post => {
-            fetch("/api/author/" + post.user)
-            .then(response => response.json())
-            .then(json => tempAuthorList.push(json.email))
-        })
-        setAuthors(tempAuthorList);
-    }, [posts]);
-
     return (
         <div>
-            {posts && posts.map((postItem, index) => (
-                <div id={postItem._id}>
-                    <p>Author: {authors && authors[index]}{console.log("Author " + authors[index])} , posted: {postItem.timestamp}</p>
-                    <p>{postItem.post}</p>
-                    <Link to={"/post/" + postItem._id}>Show comments</Link>
-                </div>
+            <h2>Posts</h2>
+            {posts && posts.map((post) => (
+                <Post user={user} jwt={jwt} id={post._id} />
             ))}
+            <hr />
             <AddPost posts={posts} setPosts={setPosts} jwt={jwt} user={user}/>
         </div>
     )

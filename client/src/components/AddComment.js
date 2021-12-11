@@ -33,7 +33,7 @@ function AddComment({comments, setComments, jwt, user, post_id}) {
             <h4>New comment</h4>
             <form onSubmit={submit} onChange={handleChange}>
                 <input type="text-area" name="comment" />
-                <input type="submit" />
+                <input type="submit" className="btn" />
             </form>
         </div>
     )
