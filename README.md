@@ -89,6 +89,9 @@ Uses components: Menu, Login
 #### "/register"     Register
 Uses components: Menu, Register
 
+#### "/logout"       Logout
+Uses components: Menu, Logout
+
 ### Components
 #### Menu
 Renders menu, Links to home, if logged in displays user's email, else displays links to login & register
@@ -98,6 +101,9 @@ Renders login form, handles login and jwt saving
 
 #### Register
 Renders register form
+
+#### Logout
+Clears jwt and userdata. Renders logged out page.
 
 #### Posts
 Manages with all posts, renders the main structure.
