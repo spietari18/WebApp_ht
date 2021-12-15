@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
+    // useState for formData
     const [userData, setUserData] = useState({});
+    const nav = useNavigate();
 
+    // Send formData, should forward user to login if register success
     const submit = (e) => {
         e.preventDefault();
 
@@ -18,7 +21,7 @@ function Register() {
         .then(response => response.json())
         .then(data => {
             if (data.email) {
-                return <Navigate to="/login" />
+                nav("/login");
             }
         })
     }
@@ -31,8 +34,8 @@ function Register() {
         <div>
             <h2>Register</h2>
             <form onSubmit={submit} onChange={handleChange}>
-                <input type="text" name="email" placeholder="email" />
-                <input type="password" name="password" placeholder="password" />
+                <input type="text" name="email" placeholder="email" className="field" />
+                <input type="password" name="password" placeholder="password" className="field" />
                 <input type="submit" className="btn" />
             </form>
         </div>

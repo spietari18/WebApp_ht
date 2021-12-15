@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link } from 'react-router-dom';
 import Post from "./Post";
 import AddPost from "./AddPost";
 
 function Posts({user, jwt}) {
+    // Store all posts to useState
     const [posts, setPosts] = useState([]);
 
+    // Get all posts available
     useEffect(() => {
         fetch("/api/post", {
             method: "GET",
@@ -20,11 +21,12 @@ function Posts({user, jwt}) {
         })
     }, []);
 
+    // Loop through all posts, render with Post component
     return (
         <div>
             <h2>Posts</h2>
             {posts && posts.map((post) => (
-                <Post user={user} jwt={jwt} id={post._id} />
+                <Post key={post._id} user={user} jwt={jwt} id={post._id} />
             ))}
             <hr />
             <AddPost posts={posts} setPosts={setPosts} jwt={jwt} user={user}/>

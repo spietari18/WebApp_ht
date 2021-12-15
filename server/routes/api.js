@@ -138,7 +138,7 @@ router.post("/post/:id", validateToken, (req, res, next) => {
 			return next(err);
 		}
 		if (post) {
-			Post.update({
+			Post.updateOne({
 				_id: post.id
 			}, {
 				post: req.body.post
@@ -160,12 +160,12 @@ router.get("/comment/:id", (req, res, next) => {
 	Comment.findOne({_id: req.params.id}, (err, comment) => {
 		if (err) {
 			if (err.name === "CastError") {
-				return res.status(404).send(`Post id ${req.params.id} not found`);
+				return res.status(404).send(`Comment with id ${req.params.id} not found`);
 			}
 			return next(err);
 		}
 		if (comment) {
-			return res.json({comment});
+			return res.status(200).json({comment});
 		} else {
 			return res.status(404).send(`Post id ${req.params.id} not found`);
 		}
@@ -174,31 +174,30 @@ router.get("/comment/:id", (req, res, next) => {
 
 // Post new comment
 router.post("/comment/:id", validateToken, (req, res, next) => {
+	if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+		return res.json("ID not valid!");
+	}
 	Comment.create({
 		user: req.user.id,
 		comment: req.body.comment,
 		timestamp: Date.now()
 	}, (err, comment) => {
-		Post.findOne({_id: req.params.id}, (err, post) => {
-			if (err) throw err;
-			if (post) {
-				console.log("New comment");
-				let comments = post.comments;
-				comments.push(comment._id);
-				Post.updateOne({id: req.params.id}, {comments: comments},(err, post) => {
-					if (err) throw err;
-					if (post) {
-						return res.status(200).json(comment);
-					}
-				})
-			}
-		})
+		console.log("New comment!");
+		if (err) throw err;
+		if (comment) {
+			Post.findOneAndUpdate({_id: req.params.id}, {$push: {comments: comment}}, (err, post) => {
+				if (err) throw err;
+				if (post) {
+					return res.status(200).json(comment);
+				}
+			})
+		}
 	})
 })
 
 // Edit existing comment
 router.post("/comment/:id", validateToken, (req, res, next) => {
-	Comment.update({_id: req.params.id}, {comment: req.body.comment}, (err, comment) => {
+	Comment.updateOne({_id: req.params.id}, {comment: req.body.comment}, (err, comment) => {
 		if (err) throw err;
 		if (comment) {
 			return res.status(200).json(comment);
@@ -218,65 +217,13 @@ router.get("/author/:id", (req, res, next) => {
 			}
 		}
 		if (users) {
-			delete users.password;
-			console.log(users)
-			return res.status(200).json(users)
+			let author = {
+				_id: users._id,
+				email: users.email
+			}
+			return res.status(200).json(author);
 		}
 	})
 })
-
-// Old endpoints, just for example!
-// Todos
-router.post("/todos", validateToken, (req, res, next) => {
-    User.findOne({email: req.user.email}, (err, user) => {
-	if (err) throw err;
-	if (!user) {
-	    return res.status(404).json({message: "User not found"});
-	} else {
-	    Todo.findOne({user: user._id}, (err, todo) => {
-		if (err) throw err;
-		if (!todo) {
-		    console.log("Todos not found, creating...");
-		    console.log(req.body.items);
-		    Todo.create({
-			user: user._id,
-			items: req.body.items
-		    }, (err, ok) => {
-			if (err) throw err;
-			return res.status(200).json({ok});
-		    });
-		} else {
-		    console.log("Todos found, appending...");
-		    console.log(req.body.items);
-		    let list = todo.items;
-		    for (let i = 0; i < req.body.items.length; i++) {
-			list.push(req.body.items[i]);
-		    }
-		    // list.push(req.body.items);
-		    console.log(list);
-		    Todo.update({
-			user: user._id
-		    }, {
-			items: list
-		    }, (err, ok) => {
-			if (err) throw err;
-			return res.status(200).json({ok});
-		    });
-		}
-	    });
-	}
-    });
-});
-
-router.get("/todos", validateToken, (req, res, next) => {
-    Todo.findOne({user: req.user._id}, (err, todo) => {
-	if (err) throw err;
-	if (!todo) {
-	    return res.status(404).json({message: "Todos not found"});
-	} else {
-	    res.json({todo});
-	}
-    });
-});
 
 module.exports = router;

@@ -1,11 +1,16 @@
 import {useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function AddComment({comments, setComments, jwt, user, post_id}) {
+function AddComment({setNewComments, setComments, jwt, user, post_id}) {
+    // Store formData to useState
     const [commentData, setCommentData] = useState({});
+    const nav = useNavigate();
 
+    // Comment submitting
     const submit = (e) => {
         e.preventDefault();
 
+        // Send comments data with post, save to given useState
         fetch("/api/comment/" + post_id, {
             method: "POST",
             headers: {
@@ -15,11 +20,18 @@ function AddComment({comments, setComments, jwt, user, post_id}) {
             body: JSON.stringify(commentData),
             mode: "cors"
         })
-        .then(response => response.json())
+        .then(response => {
+            if (response.status === 401) {
+                console.log("Not authorized!")
+                nav("/logout");
+            }
+            return response.json();
+        })
         .then(data => {
             console.log(data);
-            if (data.comment) {
-                setComments([...comments, data.comment])
+            if (data) {
+                // setComments(oldComments => [...oldComments, data.comment]);
+                setNewComments(prev => [...prev, data]);
             }
         })
     }
@@ -32,7 +44,7 @@ function AddComment({comments, setComments, jwt, user, post_id}) {
         <div>
             <h4>New comment</h4>
             <form onSubmit={submit} onChange={handleChange}>
-                <input type="text-area" name="comment" />
+                <textarea name="comment" className="field" />
                 <input type="submit" className="btn" />
             </form>
         </div>

@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Login({setJwt, setUser}) {
+    // useState to store FormData
     const [userData, setUserData] = useState({});
+    const nav = useNavigate();
 
+    // Send login information, store possible jwt and userData
     const submit = (e) => {
         e.preventDefault();
 
@@ -21,7 +24,7 @@ function Login({setJwt, setUser}) {
                 setJwt(data.token);
                 console.log(data.token);
                 setUser(JSON.parse(Buffer.from(data.token.split(".")[1], "base64").toString()));
-                return <Navigate to="/" />;
+                nav("/");
             }
         })
     }
@@ -34,8 +37,8 @@ function Login({setJwt, setUser}) {
         <div>
             <h2>Login</h2>
             <form onSubmit={submit} onChange={handleChange}>
-                <input type="text" name="email" placeholder="email" />
-                <input type="password" name="password" placeholder="password" />
+                <input type="text" name="email" placeholder="email" className="field" />
+                <input type="password" name="password" placeholder="password" className="field" />
                 <input type="submit" className="btn" />
             </form>
         </div>

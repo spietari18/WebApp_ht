@@ -1,11 +1,16 @@
 import {useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function AddPost({posts, setPosts, jwt, user}) {
+    // Store formData to useState
     const [postData, setPostData] = useState({});
+    const nav = useNavigate();
 
+    // Form submit function
     const submit = (e) => {
         e.preventDefault();
 
+        // Send forms data with post, save data to given useState
         fetch("/api/post", {
             method: "POST",
             headers: {
@@ -15,9 +20,15 @@ function AddPost({posts, setPosts, jwt, user}) {
             body: JSON.stringify(postData),
             mode: "cors"
         })
-        .then(response => response.json())
+        .then(response => {
+            if (response.status === 401) {
+                console.log("Not authorized!")
+                nav("/logout");
+            }
+            response.json();
+        })
         .then(data => {
-            if (data.post) {
+            if (data && data.post) {
                 setPosts([...posts, data.post])
             }
         })
@@ -31,7 +42,7 @@ function AddPost({posts, setPosts, jwt, user}) {
         <div>
             <h4>New Post</h4>
             <form onSubmit={submit} onChange={handleChange}>
-                <input type="text-area" name="post" />
+                <textarea name="post" className="field" />
                 <input type="submit" className="btn" />
             </form>
         </div>
