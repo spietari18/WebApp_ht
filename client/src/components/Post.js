@@ -2,8 +2,11 @@ import { useEffect, useState } from 'react';
 import AddComment from './AddComment';
 import Comment from './Comment';
 import Highlight from 'react-highlight';
+import { useParams } from 'react-router';
+import EditPost from './EditPost';
 
-function Post({jwt, user, id}) {
+function Post({jwt, user}) {
+    const id = useParams();
     // useState array for comment objects
     const [commentList, setCommentList] = useState([]);
     // useState object for post to render
@@ -16,7 +19,7 @@ function Post({jwt, user, id}) {
     // Get post data by id, store to useState
     useEffect(() => {
         if (id) {
-            fetch("/api/post/" + id)
+            fetch("/api/post/" + id.id)
             .then(response => response.json())
             .then(json => {
                 setPost(json.post);
@@ -57,12 +60,12 @@ function Post({jwt, user, id}) {
         <div>
             <hr />
             <h4>Post</h4>
-            <p>Author: {author}, posted: {post.timestamp}</p>
-            <Highlight>{post.post}</Highlight>
+            <p>Author: {author}, posted: {post.timestamp}, last edit: {post.lastedit}</p>
+            {!jwt ? <Highlight>{post.post}</Highlight> : <EditPost post={post} setPost={setPost} jwt={jwt} id={id.id} />}
             <hr />
             <h4>Comments:</h4>
             {commentList && commentList.map((comment, index) => (
-                <Comment key={index} comment={comment} />
+                <Comment key={index} originalComment={comment} jwt={jwt} />
             ))}
             <hr />
             <AddComment setNewComments={setNewComments} setComments={setCommentList} jwt={jwt} user={user} post_id={post._id} />

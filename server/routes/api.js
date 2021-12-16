@@ -106,6 +106,9 @@ router.get("/post", (req, res, next) => {
 
 // Get one post
 router.get("/post/:id", (req, res, next) => {
+	if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+		return res.json("ID not valid!");
+	}
 	Post.findOne({_id: req.params.id}, (err, post) => {
 		if (err) throw err;
 		if (!post) {
@@ -121,7 +124,8 @@ router.post("/post", validateToken, (req, res, next) => {
 	Post.create({
 		user: req.user.id,
 		post: req.body.post,
-		timestamp: Date.now()
+		timestamp: Date.now(),
+		lastedit: Date.now()
 	}, (err, post) => {
 		if (err) throw err;
 		return res.status(200).json({post});
@@ -130,7 +134,10 @@ router.post("/post", validateToken, (req, res, next) => {
 
 // Edit an existing post
 router.post("/post/:id", validateToken, (req, res, next) => {
-	Post.findOne({id: req.params.id}, (err, post) => {
+	if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+		return res.json("ID not valid!");
+	}
+	Post.findOneAndUpdate({_id: req.params.id}, {post: req.body.post, lastedit: Date.now()}, (err, post) => {
 		if (err) {
 			if (err.name === "CastError") {
 				return res.status(404).send(`Post id ${req.params.id} not found!`);
@@ -138,16 +145,7 @@ router.post("/post/:id", validateToken, (req, res, next) => {
 			return next(err);
 		}
 		if (post) {
-			Post.updateOne({
-				_id: post.id
-			}, {
-				post: req.body.post
-			}, (err, post) => {
-				if (err) throw err;
-				if (post) {
-					return res.status(200).json({post});
-				}
-			})
+			return res.status(200).json({post});
 		} else {
 			return res.status(404).send(`Post id ${req.params.id} not found`);
 		}
@@ -157,6 +155,9 @@ router.post("/post/:id", validateToken, (req, res, next) => {
 // Comments
 // Get comment by id
 router.get("/comment/:id", (req, res, next) => {
+	if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+		return res.json("ID not valid!");
+	}
 	Comment.findOne({_id: req.params.id}, (err, comment) => {
 		if (err) {
 			if (err.name === "CastError") {
@@ -180,9 +181,9 @@ router.post("/comment/:id", validateToken, (req, res, next) => {
 	Comment.create({
 		user: req.user.id,
 		comment: req.body.comment,
-		timestamp: Date.now()
+		timestamp: Date.now(),
+		lastedit: Date.now()
 	}, (err, comment) => {
-		console.log("New comment!");
 		if (err) throw err;
 		if (comment) {
 			Post.findOneAndUpdate({_id: req.params.id}, {$push: {comments: comment}}, (err, post) => {
@@ -196,11 +197,21 @@ router.post("/comment/:id", validateToken, (req, res, next) => {
 })
 
 // Edit existing comment
-router.post("/comment/:id", validateToken, (req, res, next) => {
-	Comment.updateOne({_id: req.params.id}, {comment: req.body.comment}, (err, comment) => {
-		if (err) throw err;
+router.post("/comment/edit/:id", validateToken, (req, res, next) => {
+	if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+		return res.json("ID not valid!");
+	}
+	Comment.findOneAndUpdate({_id: req.params.id}, {comment: req.body.comment, lastedit: Date.now()}, (err, comment) => {
+		if (err) {
+			if (err.name === "CastError") {
+				return res.status(404).send(`Comment id ${req.params.id} not found!`);
+			}
+			return next(err);
+		}
 		if (comment) {
 			return res.status(200).json(comment);
+		} else {
+			return res.status(404).send(`Comment id ${req.params.id} not found!`);
 		}
 	})
 })
@@ -208,6 +219,9 @@ router.post("/comment/:id", validateToken, (req, res, next) => {
 // Userdata (author)
 // Get author's email
 router.get("/author/:id", (req, res, next) => {
+	if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+		return res.json("ID not valid!");
+	}
 	User.findOne({_id: req.params.id}, (err, users) => {
 		if (err) {
 			if (err.name === "CastError") {

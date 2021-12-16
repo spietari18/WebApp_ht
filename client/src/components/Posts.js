@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import Post from "./Post";
 import AddPost from "./AddPost";
+import { Link } from "react-router-dom";
+import Highlight from "react-highlight";
 
 function Posts({user, jwt}) {
     // Store all posts to useState
@@ -8,6 +9,7 @@ function Posts({user, jwt}) {
 
     // Get all posts available
     useEffect(() => {
+        setPosts([]);
         fetch("/api/post", {
             method: "GET",
             headers: {
@@ -24,12 +26,13 @@ function Posts({user, jwt}) {
     // Loop through all posts, render with Post component
     return (
         <div>
-            <h2>Posts</h2>
-            {posts && posts.map((post) => (
-                <Post key={post._id} user={user} jwt={jwt} id={post._id} />
-            ))}
-            <hr />
             <AddPost posts={posts} setPosts={setPosts} jwt={jwt} user={user}/>
+            <hr />
+            <h2>Posts</h2>
+            <p>Click to open post and see the comments!</p>
+            {posts && posts.map((post) => (
+                <Link key={post._id} to={"/post/" + post._id} ><Highlight>{post.post}</Highlight></Link>
+            ))}
         </div>
     )
 }

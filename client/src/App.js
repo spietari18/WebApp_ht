@@ -6,6 +6,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Logout from './components/Logout';
 import './App.css';
+import Post from './components/Post';
 
 function App() {
   const [jwt, setJwt] = useState("");
@@ -17,6 +18,7 @@ function App() {
         <Menu user={user} jwt={jwt} />
         <Routes>
           <Route path="/" element={<Posts user={user} jwt={jwt} />} />
+          <Route path="/post/:id" element={<Post jwt={jwt} user={user} /> } />
           <Route path="/login" element={<Login setJwt={setJwt} setUser={setUser} />} />
           <Route path="/register" element={<Register />} />
           <Route path="/logout" element={<Logout setJwt={setJwt} setUser={setUser} jwt={jwt} />} />

@@ -1,9 +1,14 @@
 # Getting started
-Under development  
+Server can be installed using ```npm run preinstall```.  
+Client can be installed using ```npm run install```.  
+
 Server can be started using ```npm run dev:server```.  
 Client can be started using ```npm run dev:client```.  
 
 ## Server
+
+Uses Express framework, MongoDB, and node.js packages: JsonWebToken, Express-Validator, DotEnv, BcryptJS, Cors, Cookie-parser, Debug and Morgan.  
+These packages are chosen because of further experience of them.
 
 ### API endpoints
 "auth: token" expects that jsonwebtoken is in requests "authorization" header.
@@ -79,9 +84,15 @@ type: GET
 response: 200 OK, {user}  
 
 ## Client
+Client is implemented using React with some packages. React is chosen as frontend framework because I wanted to learn it. React-router-dom is used because storing jwt in useState requires no full refreshes. React router is needed when having multiple pages. Highlight is used in highlighting the code blocks.  
+Installed packages: react, react-dom, react-router-dom, react-router, react-highlight, react-scripts, web-vitals.  
+
 ### Routes
 #### "/"             Home
-Uses components: Menu, Posts, Post, AddPost, Comment, AddComment  
+Uses components: Menu, Posts  
+
+#### "/post/:id"     Post
+Uses components: Post, AddPost, EditPost, Comment, AddComment, EditComment  
 
 #### "/login"        Login
 Uses components: Menu, Login
@@ -103,7 +114,7 @@ Renders login form, handles login and jwt saving
 Renders register form
 
 #### Logout
-Clears jwt and userdata. Renders logged out page.
+Clears jwt and userdata. Renders logged out page.  
 
 #### Posts
 Manages with all posts, renders the main structure.
@@ -114,8 +125,24 @@ Renders one post and it's structure
 #### AddPost
 Renders add post -form
 
+#### EditPost
+If user logged in, shows edit button and allows user to edit post and submit it
+
 #### Comment
 Renders comment and it's structure
 
 #### AddComment
 Renders add comment -form
+
+#### EditComment
+If user logged in: shows edit button and allows user to edit comment and submit it
+
+## Features and points -table
+| Feature           | Points    |
+| :---:             | :---:     |
+| Basic features    | 25        |
+| Using React       | 5         |
+| Highlight lib     | 2         |
+| Showing timestamps| 2         |
+| Editing           | 4         |
+| Total             | 38        |
